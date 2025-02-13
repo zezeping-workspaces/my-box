@@ -1,0 +1,32 @@
+{
+  "name": "my-box",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "start": "tauri dev"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.0.6",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "ant-design-vue": "4.x",
+    "fuse.js": "^7.1.0",
+    "postcss": "^8.5.2",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.4",
+    "@tauri-apps/cli": "^2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "sass-embedded": "^1.83.4",
+    "tailwindcss": "^4.0.6",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3",
+    "vue-tsc": "^2.1.10"
+  }
+}
