@@ -24,3 +24,5 @@ serde_json = "1"
 ssh2 = { version = "^0.9", features = ["vendored-openssl"] }
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 anyhow = "1.0.95"
+rdev = { version = "0.5.3", features = ["serde"] }
+device_query = "3.0.0"
