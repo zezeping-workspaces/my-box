@@ -13,7 +13,7 @@ const { theme } = useTheme();
       ],
     }"
   >
-    <main class="layout container mx-auto bg-red-500">
+    <main class="layout container mx-auto">
       <slot></slot>
       <div>{{ theme }}</div>
     </main>
