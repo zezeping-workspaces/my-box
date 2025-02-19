@@ -1,26 +1,26 @@
-import type { Ref } from "vue";
-import { ref, /*watchEffect, */onMounted, onUnmounted } from "vue";
+import type { ComputedRef, Ref } from "vue";
+import { computed, /*watchEffect, */onMounted, onUnmounted } from "vue";
+import { useStorage } from '@vueuse/core'
 
-type Theme = "light" | "dark";
+const USE_STORAGE_THEME = `use_storage_theme`
+type Theme = "light" | "dark" | "system";
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
-let storedTheme = localStorage.getItem("theme") as Theme | null;
-export function useTheme(): { theme: Ref<Theme>; setTheme: (newTheme: Theme) => void } {
-	const theme = ref<Theme>(storedTheme || (prefersDark.matches ? "dark" : "light"));
+let storedTheme = useStorage(USE_STORAGE_THEME, 'system', localStorage) as Ref<Theme>
+export function useTheme(): { theme: ComputedRef<Theme>; persistedTheme: Ref<Theme>; setTheme: (newTheme: Theme) => void } {
+	// const theme = ref<Theme>(storedTheme.value || (prefersDark.matches ? "dark" : "light"));
+	const theme = computed(() => ['light', 'dark'].includes(storedTheme.value) ? storedTheme.value : (prefersDark.matches ? "dark" : "light"))
+	const persistedTheme = computed(() => `${storedTheme.value}`.split('@')[0] as Theme)
 
-	const setTheme = (newTheme: Theme | 'system', persist = true) => {
-		theme.value = newTheme === "system" ? (prefersDark.matches ? "dark" : "light") : newTheme;
-		if (persist) {
-			localStorage.setItem("theme", newTheme);
-			storedTheme = theme.value;
-		}
-		document.documentElement.classList.toggle("dark", newTheme === "dark");
+	const setTheme = (newTheme: Theme) => {
+		storedTheme.value = newTheme === 'system' ? `system@${Date.now()}` as any : newTheme;
+		document.documentElement.classList.toggle("dark", newTheme === "system" ? prefersDark.matches : newTheme === "dark");
 	};
 
 	// 监听系统主题变化
 	const syncSystemTheme = () => {
-		if (!localStorage.getItem("theme") && !storedTheme) {
-			setTheme(prefersDark.matches ? "dark" : "light", false);
+		if (!['light', 'dark'].includes(storedTheme.value)) {
+			setTheme('system');
 		}
 	};
 
@@ -37,5 +37,5 @@ export function useTheme(): { theme: Ref<Theme>; setTheme: (newTheme: Theme) => 
 	// 	setTheme(theme.value);
 	// });
 
-	return { theme, setTheme };
+	return { theme, persistedTheme, setTheme };
 }

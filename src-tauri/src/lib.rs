@@ -99,6 +99,31 @@ pub fn run() {
                     tauri::image::Image::from_path("icons/icon.png").unwrap(),
                 ))?;
                 // tray.set_visible(true)?;
+
+                app.on_menu_event(|handle, event| match event.id().as_ref() {
+                    "preferences" => match handle.get_webview_window("preferences") {
+                        Some(preferences_window) => {
+                            preferences_window.show().unwrap();
+                        }
+                        None => {
+                            let preferences_window = tauri::webview::WebviewWindowBuilder::new(
+                                handle,
+                                "preferences",
+                                tauri::WebviewUrl::App("/preferences".into()),
+                            )
+                            .build()
+                            .unwrap();
+                            let _ = preferences_window.set_title("Preferences");
+                            let _ = preferences_window.set_resizable(true);
+                            let _ = preferences_window.set_always_on_top(true);
+                            let _ = preferences_window.set_size(tauri::LogicalSize::new(800, 600));
+                            // let _ = preferences_window.show();
+                            // let _ = preferences_window.set_focus();
+                        }
+                    },
+                    _ => {}
+                });
+
                 tray
             };
 
