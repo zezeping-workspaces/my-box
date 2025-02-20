@@ -18,6 +18,11 @@ const routes = [
                 component: () => import('../views/preferences/base/index.vue')
             }
         ]
+    },
+    {
+        path: '/snippet',
+        name: 'snippet',
+        component: () => import('../views/snippet/index.vue')
     }
 ]
 
