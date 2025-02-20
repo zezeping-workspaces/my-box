@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from "vue";
 import { computed, /*watchEffect, */onMounted, onUnmounted } from "vue";
 import { useStorage } from '@vueuse/core'
 
-const USE_STORAGE_THEME = `use_storage_theme`
+const USE_STORAGE_THEME = `box::use_storage_theme`
 type Theme = "light" | "dark" | "system";
 
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
