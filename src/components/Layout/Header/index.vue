@@ -4,7 +4,6 @@ import Search from "./Search.vue";
 
 <template>
   <main class="header">
-    123
     <Search></Search>
   </main>
 </template>

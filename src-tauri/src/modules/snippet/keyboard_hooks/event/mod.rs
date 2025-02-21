@@ -231,7 +231,7 @@ impl Event {
                     if self.contains_shift_key() {
                         Some("!".to_string())
                     } else {
-                        Some("0".to_string())
+                        Some("1".to_string())
                     }
                 }
                 Keycode::Key2 => {
@@ -385,8 +385,8 @@ impl Event {
                 Keycode::Numpad8 => Some("8".to_string()),
                 Keycode::Numpad9 => Some("9".to_string()),
                 Keycode::Space => Some(" ".to_string()),
-                // Keycode::Tab => Some("\t".to_string()),
-                // Keycode::Enter => Some("\n".to_string()),
+                Keycode::Tab => Some("\t".to_string()),
+                Keycode::Enter => Some("\n".to_string()),
                 _ => None,
             }
         } else {
@@ -396,6 +396,7 @@ impl Event {
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
             "key": self.key_string(),
+            "backspace": self.contains_backspace_key(),
             "shift": self.contains_shift_key(),
             "ctrl": self.contains_control_key(),
             "option": self.contains_option_key(),

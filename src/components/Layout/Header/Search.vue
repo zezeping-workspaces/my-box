@@ -22,7 +22,7 @@ const fuse = new Fuse(initialSearchItems, {
 });
 
 const router = useRouter();
-const open = ref<boolean>(true);
+const open = ref<boolean>(false);
 const searchText = ref<string>("");
 const searchItems = computed(() => {
   if (!searchText.value) return initialSearchItems;
@@ -66,6 +66,7 @@ const onKeyDown = (event: KeyboardEvent) => {
   } else if (event.key === "Enter") {
     if (selectedItem.value) {
       router.push(selectedItem.value.url);
+      open.value = false;
     }
   }
 };
