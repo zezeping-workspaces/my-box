@@ -45,6 +45,10 @@ const onHighlightMatch = (text: string) => {
   );
 };
 
+const onSelectItem = (selectedItem: any) => {
+  router.push(selectedItem.url);
+  open.value = false;
+};
 const onKeyDown = (event: KeyboardEvent) => {
   // 检测操作系统并判断是否按下 Command (Mac) 或 Ctrl (Windows/Linux) + K
   if ((event.metaKey && event.key === "k") || (event.ctrlKey && event.key === "k")) {
@@ -65,8 +69,7 @@ const onKeyDown = (event: KeyboardEvent) => {
     selectedItem.value = searchItems.value[(index + 1) % searchItems.value.length];
   } else if (event.key === "Enter") {
     if (selectedItem.value) {
-      router.push(selectedItem.value.url);
-      open.value = false;
+      onSelectItem(selectedItem.value);
     }
   }
 };
@@ -94,7 +97,8 @@ onUnmounted(() => {
             :class="{
               active: selectedItem?.url === item.url,
             }"
-            @mouseover.native="selectedItem = item"
+            @mouseover="selectedItem = item"
+            @click="onSelectItem(item)"
           >
             <div class="flex items-center justify-between">
               <h3

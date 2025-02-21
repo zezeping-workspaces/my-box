@@ -1,9 +1,9 @@
 import type { Ref } from "vue";
-import { sendNotification } from '@tauri-apps/plugin-notification';
-import { watch } from "vue"
 import { listen } from '@tauri-apps/api/event';
 import { useStorage } from '@vueuse/core'
 import { getSqliteInstance } from "@/services/sqlite";
+import { writeText as clipboardWriteText } from '@tauri-apps/plugin-clipboard-manager';
+import { invoke } from '@tauri-apps/api/core';
 
 const USE_STORAGE_SERVICES_SNIPPET_INPUT_TEXT = `box::use_storage_services_snippet_input_text`
 const storedSnippetInputText = useStorage(USE_STORAGE_SERVICES_SNIPPET_INPUT_TEXT, '', localStorage) as Ref<string>
@@ -20,16 +20,16 @@ async function init() {
 				case '$': {
 					const inputText = storedSnippetInputText.value.slice(1, storedSnippetInputText.value.length)
 					const [tag, code] = inputText.split(':')
-					console.log(0, inputText, tag, code)
 					if (tag && code) {
 						const sqliteInstance = getSqliteInstance()
 						const snippets: any = await sqliteInstance.select(`select * from snippets where tag = ${tag} AND code = ${code} --case-insensitive limit 1;`)
-						console.log(1, snippets)
 						if (snippets.length > 0) {
 							const snippet = snippets[0]
-							console.log(snippet)
+							await clipboardWriteText(snippet.content) // copy
+							await invoke('snippet_write_content_handler', { inputText: `@${inputText}$`, replaceContent: snippet.content, });
 						}
 					}
+
 					storedSnippetInputText.value = ''
 					break
 				}
@@ -43,7 +43,6 @@ async function init() {
 					}
 				}
 			}
-			console.log(9, storedSnippetInputText.value)
 		})
 	}
 }

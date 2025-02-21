@@ -14,6 +14,9 @@
     "core:window:allow-close",
     "core:window:allow-start-dragging",
     "notification:default",
-    "notification:allow-register-listener"
+    "notification:allow-register-listener",
+    "clipboard-manager:default",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-text"
   ]
 }

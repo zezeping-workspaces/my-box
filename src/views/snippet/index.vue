@@ -36,10 +36,8 @@ const list = useSqliteList({
       list.pagination.total = totalValue[0].count;
     }
 
-    console.log(4, tags);
     list.records = records;
     tagOptions.value = tags.map((item: any) => ({ label: item.tag, value: item.tag }));
-    console.log(5, tagOptions.value);
   },
   columns: [
     { title: "id", dataIndex: "id", key: "id" },

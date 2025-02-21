@@ -24,3 +24,36 @@ where
     consumer.join().unwrap();
     producer.join().unwrap();
 }
+
+pub fn handle_user_input(input_text: String, _replace_content: String) -> Result<(), &'static str> {
+    use rdev::{simulate, EventType, Key, SimulateError};
+    let send = |event_type: &EventType| {
+        let delay = std::time::Duration::from_millis(25);
+        match simulate(event_type) {
+            Ok(()) => (),
+            Err(SimulateError) => {
+                println!("We could not send {:?}", event_type);
+            }
+        }
+        // Let ths OS catchup (at least MacOS)
+        std::thread::sleep(delay);
+    };
+
+    for i in 0..input_text.len() {
+        send(&EventType::KeyPress(Key::Backspace));
+        send(&EventType::KeyRelease(Key::Backspace));
+    }
+
+    if cfg!(target_os = "macos") {
+        send(&EventType::KeyPress(Key::MetaLeft));
+        send(&EventType::KeyPress(Key::KeyV));
+        send(&EventType::KeyRelease(Key::KeyV));
+        send(&EventType::KeyRelease(Key::MetaLeft));
+    } else {
+        send(&EventType::KeyPress(Key::ControlLeft));
+        send(&EventType::KeyPress(Key::KeyV));
+        send(&EventType::KeyRelease(Key::KeyV));
+        send(&EventType::KeyRelease(Key::ControlLeft));
+    }
+    Ok(())
+}

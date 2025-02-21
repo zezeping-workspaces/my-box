@@ -8,10 +8,15 @@ use tauri::{Emitter, Manager};
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
+#[tauri::command]
+fn snippet_write_content_handler(input_text: String, replace_content: String) -> Result<(), &'static str> {
+    modules::snippet::handle_user_input(input_text, replace_content)
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(plugins::sqlite::init())
@@ -146,7 +151,7 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, snippet_write_content_handler])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

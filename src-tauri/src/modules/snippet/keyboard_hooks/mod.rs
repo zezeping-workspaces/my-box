@@ -7,7 +7,7 @@ pub fn watch_keyboard(callback: impl Fn(event::Event) + Send + 'static) {
 
         let on_key_down = move |key: Option<&Keycode>, state: &event::State| {
             let event = event::Event::new(state.clone(), key.map(|k| k.clone()));
-            println!("pressed event: {:?}", event);
+            // println!("pressed event: {:?}", event);
             callback(event);
         };
         let on_key_up = move |_key: Option<&Keycode>, _hook: &event::State| {};

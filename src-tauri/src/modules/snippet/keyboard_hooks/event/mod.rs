@@ -341,7 +341,7 @@ impl Event {
                 }
                 Keycode::Semicolon => {
                     if self.contains_shift_key() {
-                        Some(": ".to_string())
+                        Some(":".to_string())
                     } else {
                         Some(";".to_string())
                     }
