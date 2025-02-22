@@ -16,7 +16,7 @@ const list = useSqliteList({
     let whereSegment = "";
 
     if (list.query.tag) {
-      whereConditions.push(`tag = ${list.query.tag}`);
+      whereConditions.push(`tag = '${list.query.tag}'`);
     }
     if (list.query.code) {
       whereConditions.push(`code LIKE '%${list.query.code}%'`);
@@ -120,6 +120,7 @@ const onDelete = async (record: Record<string, any>) => {
             :loading="list.loading"
             :options="tagOptions"
             show-search
+            placeholder="tag"
             clearable
           >
           </a-select>

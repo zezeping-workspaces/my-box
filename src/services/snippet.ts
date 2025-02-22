@@ -22,7 +22,7 @@ async function init() {
 					const [tag, code] = inputText.split(':')
 					if (tag && code) {
 						const sqliteInstance = getSqliteInstance()
-						const snippets: any = await sqliteInstance.select(`select * from snippets where tag = ${tag} AND code = ${code} --case-insensitive limit 1;`)
+						const snippets: any = await sqliteInstance.select(`select * from snippets where tag = '${tag}' AND code = '${code}' --case-insensitive limit 1;`)
 						if (snippets.length > 0) {
 							const snippet = snippets[0]
 							await clipboardWriteText(snippet.content) // copy

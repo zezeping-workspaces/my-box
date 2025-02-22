@@ -12,6 +12,7 @@ export interface AppSearchItem {
 }
 const initialSearchItems: AppSearchItem[] = [
   { title: "Snippet", description: "代码段", url: "/snippet" },
+  { title: "Stock", description: "股票", url: "/stock" },
 ];
 const fuse = new Fuse(initialSearchItems, {
   includeScore: true,

@@ -23,6 +23,11 @@ const routes = [
         path: '/snippet',
         name: 'snippet',
         component: () => import('../views/snippet/index.vue')
+    },
+    {
+        path: '/stock',
+        name: 'stock',
+        component: () => import('../views/stock/index.vue')
     }
 ]
 

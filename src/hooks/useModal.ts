@@ -1,4 +1,4 @@
-import { Slot, VNode, Reactive, getCurrentInstance, defineComponent, ref, reactive, createVNode, render, provide, onMounted, onBeforeUnmount, inject } from "vue";
+import { Slot, VNode, Reactive, getCurrentInstance, defineComponent, reactive, createVNode, render, provide, onMounted, onBeforeUnmount, inject } from "vue";
 import { ConfigProvider, Modal } from 'ant-design-vue';
 
 const ModalComponent = defineComponent({
@@ -7,7 +7,7 @@ const ModalComponent = defineComponent({
 		closeModal: Function,
 		slots: Object,
 	},
-	setup(props, ctx) {
+	setup(props) {
 
 		const closeModal = () => {
 			props.closeModal!()

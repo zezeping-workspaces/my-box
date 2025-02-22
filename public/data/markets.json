@@ -1,0 +1,5 @@
+[
+  { "label": "A股", "value": "A" },
+  { "label": "ETF基金", "value": "ETF" },
+  { "label": "港股", "value": "H" }
+]

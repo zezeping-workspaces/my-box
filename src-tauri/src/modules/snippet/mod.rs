@@ -39,7 +39,7 @@ pub fn handle_user_input(input_text: String, _replace_content: String) -> Result
         std::thread::sleep(delay);
     };
 
-    for i in 0..input_text.len() {
+    for _i in 0..input_text.len() {
         send(&EventType::KeyPress(Key::Backspace));
         send(&EventType::KeyRelease(Key::Backspace));
     }

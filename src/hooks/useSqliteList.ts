@@ -18,12 +18,13 @@ interface Options {
 export function useSqliteList(options: Options): Reactive<Required<Options>> {
 	const state = reactive<Required<Options>>({
 		loading: options.loading || false,
-		query: options.query || {},
-		pagination: options.pagination || {
+		query: { ...options.query },
+		pagination: {
 			current: 1,
 			pageSize: 20,
 			total: 0,
 			showTotal: (total) => `总: ${total} 条`,  // 显示总数
+			...options.pagination
 		},
 		records: options.records || [],
 		columns: options.columns || [],
@@ -36,16 +37,19 @@ export function useSqliteList(options: Options): Reactive<Required<Options>> {
 			}
 		},
 		async onReset() {
-			try {
-				if (options.onReset) {
-					await options.onReset();
-				} else {
-					state.query = options.query || {}
+			if (options.onReset) {
+				await options.onReset();
+			} else {
+				state.query = options.query || {}
+				state.pagination = {
+					current: 1,
+					pageSize: 20,
+					total: 0,
+					showTotal: (total) => `总: ${total} 条`,  // 显示总数
+					...options.pagination
 				}
-				await state.onLoad()
-			} finally {
-				state.loading = false
 			}
+			await state.onLoad()
 		}
 	})
 	return state

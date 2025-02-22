@@ -18,7 +18,7 @@ fn get_migrations() -> Vec<Migration> {
         },
         Migration {
             version: 2,
-            description: "create_snippet_tables",
+            description: "create_snippets_tables",
             sql: r#"CREATE TABLE IF NOT EXISTS snippets (
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
                         tag varchar(255) NOT NULL,
@@ -28,6 +28,30 @@ fn get_migrations() -> Vec<Migration> {
                         created_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
                         updated_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
                         unique(tag, code)
+                    );
+                "#,
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 3,
+            description: "create_stocks_tables",
+            sql: r#"CREATE TABLE IF NOT EXISTS stocks (
+                        id integer primary key AUTOINCREMENT,
+                        market varchar(255) NOT NULL,
+                        code varchar(255) NOT NULL,
+                        name varchar(255) NOT NULL,
+                        price decimal(10,5),
+                        price_at DATETIME NOT NULL,
+                        notice_lower_price decimal(10,2),
+                        notice_higher_price decimal(10,2),
+                        notice_enabled boolean DEFAULT FALSE,
+                        today_begin_price decimal(10,5),
+                        yestoday_end_price decimal(10,5),
+                        detail text,
+                        remark text,
+                        created_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
+                        updated_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
+                        unique(market, code)
                     );
                 "#,
             kind: MigrationKind::Up,

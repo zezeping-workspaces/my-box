@@ -41,14 +41,22 @@ const form = useForm({
         name="tag"
         :rules="{ required: true, message: 'tag is required' }"
       >
-        <a-input v-model:value="form.model.tag" placeholder="tag" clearable></a-input>
+        <a-input
+          v-model:value.trim="form.model.tag"
+          placeholder="tag"
+          clearable
+        ></a-input>
       </a-form-item>
       <a-form-item
         label="code"
         name="code"
         :rules="{ required: true, message: 'code is required' }"
       >
-        <a-input v-model:value="form.model.code" placeholder="code" clearable></a-input>
+        <a-input
+          v-model:value.trim="form.model.code"
+          placeholder="code"
+          clearable
+        ></a-input>
       </a-form-item>
       <a-form-item
         label="content"

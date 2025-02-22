@@ -1,4 +1,4 @@
-import { isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification';
+import { isPermissionGranted, requestPermission, sendNotification as sendSystemNotification, Options } from '@tauri-apps/plugin-notification';
 
 export async function onGranted(callback: () => Promise<void>) {
 	let permissionGranted = await isPermissionGranted();
@@ -10,6 +10,10 @@ export async function onGranted(callback: () => Promise<void>) {
 	if (permissionGranted) {
 		await callback()
 	}
+}
+
+export function sendNotification(options: Options | string): void {
+	sendSystemNotification(options)
 }
 
 async function init() {
