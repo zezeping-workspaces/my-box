@@ -1,12 +1,9 @@
 <script lang="tsx" setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useTheme } from "@/hooks/useTheme";
-import { invoke } from "@tauri-apps/api/core";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 
-const { persistedTheme, theme, setTheme } = useTheme();
-const appWindow = getCurrentWindow();
+const { persistedTheme, theme } = useTheme();
 const route = useRoute();
 
 const menus = computed(() => [

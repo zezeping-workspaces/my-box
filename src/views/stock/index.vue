@@ -6,7 +6,6 @@ import { useModal } from "@/hooks/useModal";
 import { notification } from "ant-design-vue";
 import { usePublicData } from "@/hooks/usePublicData";
 import dayjs from "dayjs";
-import { max } from "rxjs";
 
 const sqliteInstance = getSqliteInstance();
 const modal = useModal();
