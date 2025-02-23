@@ -9,7 +9,10 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 #[tauri::command]
-fn snippet_write_content_handler(input_text: String, replace_content: String) -> Result<(), &'static str> {
+fn snippet_write_content_handler(
+    input_text: String,
+    replace_content: String,
+) -> Result<(), &'static str> {
     modules::snippet::handle_user_input(input_text, replace_content)
 }
 
@@ -75,6 +78,7 @@ pub fn run() {
                     ])
                     .build()?;
                 let tray = tauri::tray::TrayIconBuilder::new()
+                    .icon(app.default_window_icon().unwrap().clone())
                     .menu(&menu)
                     .on_menu_event(|handle, event| match event.id().as_ref() {
                         "quit" => {
@@ -101,9 +105,9 @@ pub fn run() {
                 // tray.set_title(Some("my-box"))?;
                 // tray.set_tooltip(Some("my-box"))?;
                 tray.set_show_menu_on_left_click(false)?;
-                tray.set_icon(Some(
-                    tauri::image::Image::from_path("icons/icon.png").unwrap(),
-                ))?;
+                // tray.set_icon(Some(
+                //     tauri::image::Image::from_path("icons/icon.png").unwrap(),
+                // ))?;
                 // tray.set_visible(true)?;
 
                 app.on_menu_event(|handle, event| match event.id().as_ref() {
@@ -151,7 +155,10 @@ pub fn run() {
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet, snippet_write_content_handler])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            snippet_write_content_handler
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

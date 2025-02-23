@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useTheme } from "@/hooks/useTheme";
+import Information from "./Information.vue";
 
 const { persistedTheme, theme } = useTheme();
 const route = useRoute();
@@ -30,9 +31,10 @@ const menus = computed(() => [
     </ul>
     <div class="[grid-area:main]">
       <router-view></router-view>
-      <div>persistedTheme: {{ persistedTheme }}, theme: {{ theme }}</div>
+      <Information></Information>
     </div>
     <div class="[grid-area:footer]">
+      <div>persistedTheme: {{ persistedTheme }}, theme: {{ theme }}</div>
       <router-link to="/">Home</router-link>
     </div>
   </main>

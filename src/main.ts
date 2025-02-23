@@ -10,7 +10,7 @@ import "./assets/styles/application.scss";
 
 
 async function init() {
-	services.init()
+	await services.init()
 }
 
 async function startApp() {

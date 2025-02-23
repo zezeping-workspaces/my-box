@@ -48,6 +48,7 @@ fn get_migrations() -> Vec<Migration> {
                         today_begin_price decimal(10,5),
                         yestoday_end_price decimal(10,5),
                         detail text,
+                        extra text,
                         remark text,
                         created_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
                         updated_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),

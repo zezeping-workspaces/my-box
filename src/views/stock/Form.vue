@@ -32,7 +32,7 @@ const form = useForm({
       notice_higher_price,
       remark = "",
     } = model;
-    let sql = `INSERT INTO stocks(market, code, name, price, price_at, today_begin_price, yestoday_end_price, detail, remark) values($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+    let sql = `INSERT INTO stocks(market, code, name, price, price_at, today_begin_price, yestoday_end_price, notice_lower_price, notice_higher_price, detail, remark) values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`;
     let sqlData = [
       market,
       code,
@@ -41,6 +41,8 @@ const form = useForm({
       price_at,
       today_begin_price,
       yestoday_end_price,
+      notice_lower_price,
+      notice_higher_price,
       detail,
       remark,
     ];

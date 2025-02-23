@@ -13,7 +13,6 @@ const currentTheme = computed({
 
 <template>
   <form class="[grid-area:main]" @submit.prevent>
-    {{ currentTheme }}
     <div class="form-item flex gap-2">
       <!-- title -->
       <label class="form-item-title font-bold">主题:</label>

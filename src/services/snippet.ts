@@ -12,6 +12,7 @@ async function init() {
 
 	async function listenInputEvents() {
 		listen<any>('BOX::SNIPPET::INPUT_EVENT', async (event) => {
+			// console.log('snippet input event', event.payload.key, storedSnippetInputText.value)
 			switch (event.payload.key) {
 				case '@': {
 					storedSnippetInputText.value = '@'
