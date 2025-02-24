@@ -1,9 +1,14 @@
+import type { Ref } from "vue";
 import { interval } from "rxjs";
 import { startWith } from "rxjs/operators";
 import { getSqliteInstance } from "./sqlite";
 import { sendNotification } from './notification';
 import { usePublicData, Options as PublciDataOptions } from "@/hooks/usePublicData";
 import { fetchStocksApi, } from "@/api";
+import { useStorage } from '@vueuse/core'
+import dayjs from "dayjs";
+import axios from "axios";
+import { message } from '@tauri-apps/plugin-dialog';
 
 async function init() {
 	const market = usePublicData("/data/markets.json");
@@ -15,9 +20,66 @@ async function init() {
 		.subscribe(() => {
 			if (market.records.length) {
 				updateSqliteStocks(market);
+				checkTimeBuyReverseRepurchaseFund();
 			}
 		});
 }
+
+const isHolidayMap: Record<string, string> = {}
+export async function checkIsBusinessDay() {
+	const now = dayjs();
+	const day = now.day();
+	const dateStr = now.format('YYYY-MM-DD');
+	// 判断是否是周六或周日
+	if (day === 0 || day === 6) {
+		return false; // 股市休市
+	}
+	if (!isHolidayMap[dateStr]) {
+		const { data: rHolidaysData } = await axios.get(`https://zezeping.com/gateway/api/calendar/holiday?date=${dateStr}`);
+		const holidaySummary = rHolidaysData.simple_events.map((item: any) => item.summary).join('&')
+		Object.assign(isHolidayMap, {
+			[dateStr]: holidaySummary.includes('休') ? 'true' : 'false'
+		})
+	}
+	if (isHolidayMap[dateStr] === 'true') return false;
+	return true
+}
+
+export async function checkIsBusinessTime() {
+	const hours = dayjs().hour();
+	const minutes = dayjs().minute();
+	const day = dayjs().day();
+	const dateStr = dayjs().format('YYYY-MM-DD');
+	if (!await checkIsBusinessDay()) {
+		return false; // 股市休市
+	}
+	const isWorkMoning = (hours === 9 && minutes >= 30) || (hours > 9 && hours < 11) || (hours === 11 && minutes <= 30); // 判断是否在上午交易时段
+	const isWorkAfternoon = (hours >= 13 && hours < 15) || (hours === 15 && minutes <= 0); // 判断是否在下午交易时段
+	if (!isWorkMoning && !isWorkAfternoon) return false;
+}
+
+const USE_STORAGE_SERVICES_STOCK_BUY_REVERSE_REPURCHASE_FUND = `box::use_storage_services_stock_buy_reverse_repurchase_fund`
+const storedStockBuyReverseRepurchaseFund = useStorage(USE_STORAGE_SERVICES_STOCK_BUY_REVERSE_REPURCHASE_FUND, '', localStorage) as Ref<string>
+
+// 是否需要购买逆回购
+async function checkTimeBuyReverseRepurchaseFund() {
+	// 15点到15点半购买逆回购基金
+	const now = dayjs();
+	const todayIdentify = now.format("YYYY-MM-DD");
+	if (storedStockBuyReverseRepurchaseFund.value === todayIdentify) return
+	if (now.hour() === 15 && now.minute() > 0 && now.minute() <= 30) {
+		// 判断是否为交易日
+		if (await checkIsBusinessDay()) {
+			message('请购买逆回购基金!', { title: '交易提醒', kind: 'info' }); // 提醒购买逆回购基金
+			sendNotification({
+				title: "交易提醒",
+				body: `请购买逆回购基金!`,
+			})
+		}
+		storedStockBuyReverseRepurchaseFund.value = todayIdentify
+	}
+}
+
 
 async function updateSqliteStocks(market: PublciDataOptions) {
 	try {

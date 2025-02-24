@@ -2,10 +2,10 @@ use tauri_plugin_sql::{Builder, Migration, MigrationKind};
 
 fn get_migrations() -> Vec<Migration> {
     let migrations = vec![
-        // Define your migrations here
+        // kvs table migration
         Migration {
             version: 1,
-            description: "create_kvs_tables",
+            description: "create_kvs_table",
             sql: r#"CREATE TABLE kvs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
                         key STRING NOT NULL, 
@@ -16,9 +16,10 @@ fn get_migrations() -> Vec<Migration> {
                 "#,
             kind: MigrationKind::Up,
         },
+        // snippets table migration
         Migration {
             version: 2,
-            description: "create_snippets_tables",
+            description: "create_snippets_table",
             sql: r#"CREATE TABLE IF NOT EXISTS snippets (
                         id INTEGER PRIMARY KEY AUTOINCREMENT, 
                         tag varchar(255) NOT NULL,
@@ -32,9 +33,32 @@ fn get_migrations() -> Vec<Migration> {
                 "#,
             kind: MigrationKind::Up,
         },
+        // dic_stocks table migration
         Migration {
             version: 3,
-            description: "create_stocks_tables",
+            description: "create_dic_stocks_table",
+            sql: r#"CREATE TABLE IF NOT EXISTS dic_stocks (
+                        id integer primary key AUTOINCREMENT,
+                        market varchar(255) NOT NULL,
+                        code varchar(255) NOT NULL,
+                        name varchar(255) NOT NULL,
+                        price decimal(10,5) NOT NULL,
+                        price_at DATETIME NOT NULL,
+                        detail text,
+                        extra text,
+                        extra2 text,
+                        remark text,
+                        created_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
+                        updated_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
+                        unique(market, code)
+                    );
+                "#,
+            kind: MigrationKind::Up,
+        },
+        // stocks table migration
+        Migration {
+            version: 4,
+            description: "create_stocks_table",
             sql: r#"CREATE TABLE IF NOT EXISTS stocks (
                         id integer primary key AUTOINCREMENT,
                         market varchar(255) NOT NULL,
@@ -47,7 +71,7 @@ fn get_migrations() -> Vec<Migration> {
                         notice_enabled boolean DEFAULT FALSE,
                         today_begin_price decimal(10,5),
                         yestoday_end_price decimal(10,5),
-                        detail text,
+                        dic_stock_id integer,
                         extra text,
                         remark text,
                         created_at DATETIME NOT NULL DEFAULT (datetime('now','localtime')),
