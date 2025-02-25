@@ -31,7 +31,7 @@ function subscribeChannel(channel: string) {
 						today_begin_price: (detail["今开"] || detail["开盘价"]),
 						yestoday_end_price: detail["昨收"],
 					}
-					const priceAt = dayjs(updateTime).date();
+					const priceAt = dayjs(updateTime).toDate();
 					const dicStock = new DicStock({
 						market: marketValue,
 						code,
@@ -56,6 +56,7 @@ function subscribeChannel(channel: string) {
 
 async function init() {
 	subscribeChannel('A股');
+	subscribeChannel('ETF基金');
 }
 
 export default {

@@ -10,14 +10,16 @@ class DicStock {
 	code?: string;
 	name?: string;
 	price?: number;
-	price_at?: number;
+	price_at?: Date;
 	detail?: string;
 	extra?: DicStockExtra;
-	updated_at?: number;
-	created_at?: number;
+	updated_at?: Date;
+	created_at?: Date;
 
 	constructor(data: Partial<DicStock>) {
-		Object.assign(this, data);
+		Object.assign(this, {
+			...data
+		});
 	}
 
 	async save(): Promise<boolean> {
@@ -31,9 +33,10 @@ class DicStock {
 			}
 		}
 		if (this.id) {
+			this.updated_at = new Date()
 			await sqliteInstance.execute(
-				`UPDATE dic_stocks set market = $1, code = $2, name = $3, price = $4, price_at = $5, detail = $6, extra = $7 where id = $8;`,
-				[this.market, this.code, this.name, this.price, this.price_at, this.detail, this.extra, this.id]
+				`UPDATE dic_stocks set market = $1, code = $2, name = $3, price = $4, price_at = $5, detail = $6, extra = $7, updated_at = $8 where id = $9;`,
+				[this.market, this.code, this.name, this.price, this.price_at, this.detail, this.extra, this.updated_at, this.id]
 			);
 		}
 		else {

@@ -27,12 +27,11 @@ const form = useForm({
       price_at,
       today_begin_price,
       yestoday_end_price,
-      detail,
       notice_lower_price,
       notice_higher_price,
       remark = "",
     } = model;
-    let sql = `INSERT INTO stocks(market, code, name, price, price_at, today_begin_price, yestoday_end_price, notice_lower_price, notice_higher_price, detail, remark) values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);`;
+    let sql = `INSERT INTO stocks(market, code, name, price, price_at, today_begin_price, yestoday_end_price, notice_lower_price, notice_higher_price, remark) values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`;
     let sqlData = [
       market,
       code,
@@ -43,7 +42,6 @@ const form = useForm({
       yestoday_end_price,
       notice_lower_price,
       notice_higher_price,
-      detail,
       remark,
     ];
     if (props.record) {
@@ -73,7 +71,6 @@ const onQueryCode = async (marketValue: string, code: string) => {
     price_at: stock?.updateTime,
     today_begin_price: stock?.detail?.["今开"] || stock?.detail?.["开盘价"],
     yestoday_end_price: stock?.detail?.["昨收"],
-    detail: stock?.detail,
   });
 };
 

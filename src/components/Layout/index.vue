@@ -15,6 +15,7 @@ const configProvider = computed(() => ({
     ],
   },
 }));
+
 provide("configProvider", configProvider);
 </script>
 

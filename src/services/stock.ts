@@ -89,14 +89,13 @@ async function updateSqliteStocks(market: PublciDataOptions) {
 			const newStock = rData?.data?.stocks?.[0];
 			if (newStock) {
 				await sqliteInstance.execute(
-					`UPDATE stocks set name = $1, price = $2, price_at = $3, today_begin_price = $4, yestoday_end_price = $5, detail = $6 where id = $7;`,
+					`UPDATE stocks set name = $1, price = $2, price_at = $3, today_begin_price = $4, yestoday_end_price = $5 where id = $6;`,
 					[
 						newStock.name,
 						newStock.price,
 						newStock.updateTime,
 						newStock.detail?.["今开"] || newStock.detail?.["开盘价"],
 						newStock.detail?.["昨收"],
-						newStock.detail,
 						stock.id
 					])
 			}

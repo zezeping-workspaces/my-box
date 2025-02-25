@@ -8,7 +8,6 @@ import "./assets/styles/tailwindcss.css";
 import 'ant-design-vue/dist/reset.css';
 import "./assets/styles/application.scss";
 
-
 async function init() {
 	await services.init()
 }
@@ -19,7 +18,7 @@ async function startApp() {
 	} catch (error) {
 		console.error(error)
 	}
-	
+
 
 	const app = createApp(App);
 	app.use(Antd);
