@@ -21,7 +21,6 @@ class DicStock {
 	}
 
 	async save(): Promise<boolean> {
-		console.log('saving', this)
 		const sqliteInstance = getSqliteInstance();
 
 		const dbStocks: any = await sqliteInstance.select(`SELECT * FROM dic_stocks WHERE market = $1 AND code = $2;`, [this.market, this.code]);

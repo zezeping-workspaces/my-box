@@ -29,3 +29,4 @@ device_query = "3.0.0"
 tauri-plugin-notification = "2"
 tauri-plugin-clipboard-manager = "2"
 tauri-plugin-dialog = "2"
+tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
