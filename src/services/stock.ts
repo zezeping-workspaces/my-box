@@ -12,7 +12,6 @@ import { message } from '@tauri-apps/plugin-dialog';
 
 async function init() {
 	const market = usePublicData("/data/markets.json");
-	await new Promise((resolve) => setTimeout(resolve, 1000));
 	const _subscription = interval(60 * 1000)
 		.pipe(
 			startWith(0) // 立即触发一次

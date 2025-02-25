@@ -25,6 +25,11 @@ const routes = [
         component: () => import('../views/snippet/index.vue')
     },
     {
+        path: '/dicStock',
+        name: 'dicStock',
+        component: () => import('../views/dicStock/index.vue')
+    },
+    {
         path: '/stock',
         name: 'stock',
         component: () => import('../views/stock/index.vue')

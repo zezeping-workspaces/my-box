@@ -9,15 +9,21 @@ export interface Options {
 	getValueFromLabel(label: string): string;
 }
 
+const dataMaps: Record<string, any> = {}
 export function usePublicData(path: string): Reactive<Options> {
 	const state = reactive<Required<Options>>({
 		loading: false,
-		records: [],
+		records: dataMaps[path] || [],
 		async onLoad() {
 			try {
 				state.loading = true
-				const { data: rData } = await axios.get(path);
-				state.records = rData
+				if (dataMaps[path]) {
+					state.records = dataMaps[path]
+				} else {
+					const { data: rData } = await axios.get(path);
+					state.records = rData
+					dataMaps[path] = rData
+				}
 			} finally {
 				state.loading = false
 			}
@@ -26,12 +32,12 @@ export function usePublicData(path: string): Reactive<Options> {
 			const record = state.records.find((r) => r.value === value)
 			return record ? record.label : null
 		},
+
+
 		getValueFromLabel(label: string): string {
 			const record = state.records.find((r) => r.label === label)
 			return record ? record.value : null
 		}
 	})
-
-	state.onLoad()
 	return state
 }
