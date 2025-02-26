@@ -22,7 +22,10 @@ const list = useSqliteList({
       whereConditions.push(`market = '${list.query.market}'`);
     }
     if (list.query.code) {
-      whereConditions.push(`code LIKE '%${list.query.code}%'`);
+      whereConditions.push(`code = '${list.query.code}'`);
+    }
+    if (list.query.name) {
+      whereConditions.push(`name LIKE '%${list.query.name}%'`);
     }
     if (whereConditions.length) {
       whereSegment = ` WHERE ${whereConditions.join(" AND ")} --case-insensitive`;
@@ -205,6 +208,9 @@ function getPercent(a: number, b: number) {
         </a-form-item>
         <a-form-item>
           <a-input v-model:value="list.query.code" placeholder="code"></a-input>
+        </a-form-item>
+        <a-form-item>
+          <a-input v-model:value="list.query.name" placeholder="name"></a-input>
         </a-form-item>
         <a-form-item>
           <div class="flex gap-2 items-center">

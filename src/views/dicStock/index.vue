@@ -1,12 +1,14 @@
 <script lang="tsx" setup>
-import { computed, createVNode, defineAsyncComponent } from "vue";
+import { ref, computed } from "vue";
+import { useAsyncState } from "@vueuse/core";
 import { DicStock } from "@/model";
 import { useSqliteList } from "@/hooks/useSqliteList";
 import { getSqliteInstance } from "@/services/sqlite";
 import { useModal } from "@/hooks/useModal";
-import { notification } from "ant-design-vue";
 import { usePublicData } from "@/hooks/usePublicData";
 import dayjs from "dayjs";
+import { fetch } from "@tauri-apps/plugin-http";
+import { merge } from "lodash-es";
 
 const sqliteInstance = getSqliteInstance();
 const modal = useModal();
@@ -21,7 +23,10 @@ const list = useSqliteList({
       whereConditions.push(`market = '${list.query.market}'`);
     }
     if (list.query.code) {
-      whereConditions.push(`code LIKE '%${list.query.code}%'`);
+      whereConditions.push(`code = '${list.query.code}'`);
+    }
+    if (list.query.name) {
+      whereConditions.push(`name LIKE '%${list.query.name}%'`);
     }
     if (whereConditions.length) {
       whereSegment = ` WHERE ${whereConditions.join(" AND ")} --case-insensitive`;
@@ -38,7 +43,7 @@ const list = useSqliteList({
       });
     });
   },
-  columns: [
+  columns: computed(() => [
     // { title: "id", dataIndex: "id", key: "id" },
     // { title: "market", dataIndex: "market", key: "market" },
     { title: "code", dataIndex: "code", key: "code", fixed: "left", align: "center" },
@@ -63,8 +68,20 @@ const list = useSqliteList({
       key: "extra.yestoday_end_price",
       align: "center",
     },
+    {
+      title: "股息",
+      dataIndex: "extra.dividend",
+      key: "extra.dividend",
+      align: "center",
+    },
+    {
+      title: "股息登记日",
+      dataIndex: "extra.dividend_record_at",
+      key: "extra.dividend_record_at",
+      align: "center",
+    },
     { title: "价格时间", dataIndex: "price_at", key: "price_at", align: "center" },
-  ],
+  ]),
 });
 list.onLoad();
 
@@ -78,8 +95,45 @@ function getPercent(a: number, b: number) {
 }
 
 const partialRecords = computed(() => {
-  return list.records.slice(0, 300);
+  return list.records.slice(0, 100);
 });
+
+const dividendRefershedCount = ref(0);
+const dividendState = useAsyncState(
+  async () => {
+    for (const stock of list.records) {
+      if (stock.market !== "A") continue;
+      dividendRefershedCount.value += 1;
+      try {
+        const rData: any = await fetch(
+          `http://akshare.frp.zezeping.com/api/public/stock_fhps_detail_em?symbol=${stock.code}`,
+          { method: "GET" }
+        ).then((response) => response.json());
+        // 查找最近日期
+        const closestRecord = rData
+          .filter((i: any) => i["股权登记日"] && i["现金分红-股息率"])
+          .reduce((closest: any, current: any) => {
+            if (!closest) return current;
+            const closestDate = dayjs(closest["股权登记日"]);
+            const currentDate = dayjs(current["股权登记日"]);
+            return closestDate.isAfter(currentDate) ? closest : current;
+          }, null);
+        merge(stock, {
+          extra: {
+            dividend: closestRecord["现金分红-股息率"],
+            dividend_record_at: dayjs(closestRecord["股权登记日"]).toDate().getTime(),
+          },
+        });
+        await stock.save();
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    dividendRefershedCount.value = 0;
+  },
+  null,
+  { immediate: false }
+);
 </script>
 
 <template>
@@ -101,12 +155,20 @@ const partialRecords = computed(() => {
           <a-input v-model:value="list.query.code" placeholder="code"></a-input>
         </a-form-item>
         <a-form-item>
+          <a-input v-model:value="list.query.name" placeholder="name"></a-input>
+        </a-form-item>
+        <a-form-item>
           <div class="flex gap-2 items-center">
             <a-button type="primary" html-type="submit" :disabled="list.loading">
               搜索
             </a-button>
             <a-button @click="list.onReset">重置</a-button>
             <a-divider type="vertical"></a-divider>
+            <a-button
+              :loading="!!dividendRefershedCount"
+              @click="() => dividendState.execute()"
+              >获取股息({{ dividendRefershedCount }})</a-button
+            >
           </div>
         </a-form-item>
       </a-form>
@@ -163,6 +225,18 @@ const partialRecords = computed(() => {
         </template>
         <template v-if="column.dataIndex === 'extra.yestoday_end_price'">
           <a-tag>{{ record.extra.yestoday_end_price }}</a-tag>
+        </template>
+        <template v-if="column.dataIndex === 'extra.dividend'">
+          <a-tag>{{
+            record.extra.dividend ? `${(record.extra.dividend * 100).toFixed(2)}%` : ""
+          }}</a-tag>
+        </template>
+        <template v-if="column.dataIndex === 'extra.dividend_record_at'">
+          {{
+            record.extra.dividend_record_at
+              ? dayjs(record.extra.dividend_record_at).format("YYYY-MM-DD")
+              : ""
+          }}
         </template>
         <template v-else-if="column.dataIndex === 'price_at'">
           {{ text ? dayjs(text).format("YYYY-MM-DD HH:mm:ss") : "" }}

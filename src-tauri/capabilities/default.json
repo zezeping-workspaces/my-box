@@ -21,7 +21,10 @@
     "dialog:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://zezeping.com" }],
+      "allow": [
+        { "url": "https://zezeping.com" },
+        { "url": "http://akshare.frp.zezeping.com" }
+      ],
       "deny": []
     }
   ]

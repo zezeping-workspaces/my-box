@@ -1,7 +1,6 @@
 import client from "@/utils/apollo";
 import dayjs from "dayjs";
 import { usePublicData } from "@/hooks/usePublicData";
-import { getSqliteInstance } from "./sqlite";
 import { DicStock } from '@/model';
 import { fetch } from '@tauri-apps/plugin-http';
 const SUBSCRIBE_DATA = `
@@ -22,7 +21,7 @@ function subscribeChannel(channel: string) {
 				const stocksFile = data.data.stocksFile.file;
 				const url = `https://zezeping.com/gateway/${stocksFile}`.replace("cos", "cos/_sign");
 				const newStocks: any = await fetch(url).then((response) => response.json()).catch((error) => {
-					console.error(1, error);
+					console.error(error);
 					throw error
 				});
 				for (const newStock of newStocks) {

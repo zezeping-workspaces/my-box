@@ -1,7 +1,10 @@
 import { getSqliteInstance } from "@/services/sqlite";
+import { merge, isEqual } from 'lodash-es'
 interface DicStockExtra {
 	today_begin_price: number;
 	yestoday_end_price: number;
+	dividend?: number;
+	dividend_record_at?: number // 登记日
 }
 
 class DicStock {
@@ -22,16 +25,32 @@ class DicStock {
 		});
 	}
 
+	static async find(market: string, code: string) {
+		const sqliteInstance = getSqliteInstance();
+		const dbStocks: any = await sqliteInstance.select(`SELECT * FROM dic_stocks WHERE market = $1 AND code = $2;`, [market, code]);
+		if (dbStocks.length > 0) {
+			const dbStock = dbStocks[0];
+			return new DicStock({
+				...dbStock,
+				detail: dbStock.detail ? JSON.parse(dbStock.detail) : {},
+				extra: dbStock.extra ? JSON.parse(dbStock.extra) : {},
+			})
+		}
+		return null
+	}
+
 	async save(): Promise<boolean> {
 		const sqliteInstance = getSqliteInstance();
 
-		const dbStocks: any = await sqliteInstance.select(`SELECT * FROM dic_stocks WHERE market = $1 AND code = $2;`, [this.market, this.code]);
-		if (dbStocks.length > 0) {
-			this.id = dbStocks[0].id
-			if (dbStocks[0].price === this.price) {
+		const dbStock: any = await DicStock.find(this.market!, this.code!);
+		if (dbStock) {
+			if (isEqual(dbStock, this)) {
 				return false
+			} else {
+				merge(this, { ...dbStock }, this)
 			}
 		}
+
 		if (this.id) {
 			this.updated_at = new Date()
 			await sqliteInstance.execute(

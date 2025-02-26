@@ -1,4 +1,4 @@
-import { Reactive, reactive } from "vue"
+import { ComputedRef, Reactive, reactive } from "vue"
 
 interface Options {
 	loading?: boolean;
@@ -10,7 +10,7 @@ interface Options {
 		showTotal: (total: number) => string
 	};
 	records?: Record<string, any>[];
-	columns?: Record<string, any>[];
+	columns?: Record<string, any>[] | ComputedRef<Record<string, any>[]>;
 	onLoad?: () => Promise<void>;
 	onReset?: () => Promise<void>;
 }
