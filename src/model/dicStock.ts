@@ -41,13 +41,12 @@ class DicStock {
 
 	async save(): Promise<boolean> {
 		const sqliteInstance = getSqliteInstance();
-
 		const dbStock: any = await DicStock.find(this.market!, this.code!);
 		if (dbStock) {
 			if (isEqual(dbStock, this)) {
 				return false
 			} else {
-				merge(this, { ...dbStock }, this)
+				Object.assign(this, merge({ ...dbStock }, this))
 			}
 		}
 

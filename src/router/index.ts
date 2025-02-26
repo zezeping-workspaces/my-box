@@ -27,7 +27,12 @@ const routes = [
     {
         path: '/dicStock',
         name: 'dicStock',
-        component: () => import('../views/dicStock/index.vue')
+        component: () => import('../views/dicStock/index.vue'),
+        redirect: '/dicStock/aStock',
+        children: [
+            { path: 'aStock', name: 'dicStock/aStock', component: () => import('../views/dicStock/aStock/index.vue') },
+            { path: 'etfStock', name: 'dicStock/etfStock', component: () => import('../views/dicStock/etfStock/index.vue') }
+        ]
     },
     {
         path: '/stock',
