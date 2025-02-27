@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { ref, computed } from "vue";
+import { ref, computed, createVNode, defineAsyncComponent } from "vue";
 import { useAsyncState } from "@vueuse/core";
 import { DicStock } from "@/model";
 import { useSqliteList } from "@/hooks/useSqliteList";
@@ -8,8 +8,10 @@ import dayjs from "dayjs";
 import { fetch } from "@tauri-apps/plugin-http";
 import { merge } from "lodash-es";
 import { Tag } from "ant-design-vue";
+import { useModal } from "@/hooks/useModal";
 
 const sqliteInstance = getSqliteInstance();
+const modal = useModal();
 // const market = usePublicData("/data/markets.json");
 const list = useSqliteList({
   query: {
@@ -50,25 +52,20 @@ const list = useSqliteList({
     {
       title: "code",
       dataIndex: "code",
-      key: "code",
-      width: 100,
+      width: 70,
       fixed: "left",
-      align: "center",
     },
     {
       title: "名称",
       dataIndex: "name",
-      key: "name",
       width: 100,
       fixed: "left",
-      align: "center",
       ellipsis: true,
     },
     {
       title: "实时价",
       dataIndex: "price",
-      key: "price",
-      align: "center",
+      width: 80,
       sorter: (a: any, b: any) => (a.price || 0) - (b.price || 0),
     },
     {
@@ -86,9 +83,8 @@ const list = useSqliteList({
     },
     {
       title: "今开",
+      width: 80,
       dataIndex: "extra.today_begin_price",
-      key: "extra.today_begin_price",
-      align: "center",
       customRender: ({ record }: any) => {
         const yestoday_end_price = record.extra.yestoday_end_price || 0;
         return (
@@ -104,9 +100,9 @@ const list = useSqliteList({
     },
     {
       title: "昨收",
-      dataIndex: "extra.yestoday_end_price",
-      key: "extra.yestoday_end_price",
+      width: 80,
       align: "center",
+      dataIndex: "extra.yestoday_end_price",
       customRender: ({ record }: any) => {
         return <Tag>{record.extra.yestoday_end_price}</Tag>;
       },
@@ -167,6 +163,7 @@ const list = useSqliteList({
     },
     {
       title: "市净率",
+      width: 90,
       dataIndex: "detail.市净率",
       customRender: ({ record }: any) => record.detail.市净率,
       filters: [
@@ -182,7 +179,8 @@ const list = useSqliteList({
       sorter: (a: any, b: any) => a.detail.市净率 - b.detail.市净率,
     },
     {
-      title: "市盈率(动)",
+      title: "市盈率|动",
+      width: 105,
       dataIndex: "detail.市盈率(动)",
       customRender: ({ record }: any) => record.detail["市盈率-动态"],
       filters: [
@@ -204,6 +202,7 @@ const list = useSqliteList({
     },
     {
       title: "量比",
+      width: 80,
       dataIndex: "detail.量比",
       customRender: ({ record }: any) => record.detail["量比"],
       filters: [
@@ -221,6 +220,7 @@ const list = useSqliteList({
     },
     {
       title: "换手率",
+      width: 90,
       dataIndex: "detail.换手率",
       customRender: ({ record }: any) => record.detail["换手率"] + "%",
       filters: [
@@ -238,16 +238,13 @@ const list = useSqliteList({
     },
     {
       title: "股息",
+      width: 80,
       dataIndex: "extra.dividend",
-      key: "extra.dividend",
-      align: "center",
       sorter: (a: any, b: any) => (a.extra.dividend || 0) - (b.extra.dividend || 0),
     },
     {
       title: "股息登记日",
       dataIndex: "extra.dividend_record_at",
-      key: "extra.dividend_record_at",
-      align: "center",
       sorter: (a: any, b: any) =>
         (a.extra.dividend_record_at || 0) - (b.extra.dividend_record_at || 0),
     },
@@ -271,6 +268,7 @@ const list = useSqliteList({
     },
     {
       title: "总市值 (流通市值)",
+      width: 150,
       dataIndex: "detail.总市值/流通市值",
       customRender: ({ record }: any) =>
         `${(record.detail["总市值"] / 1e8).toFixed(2)}亿 (${(
@@ -287,7 +285,7 @@ const list = useSqliteList({
       },
       sorter: (a: any, b: any) => a.detail["总市值"] - b.detail["总市值"],
     },
-    { title: "价格时间", dataIndex: "price_at", key: "price_at", align: "center" },
+    { title: "价格时间", dataIndex: "price_at" },
   ]),
 });
 list.onLoad();
@@ -301,6 +299,31 @@ function getPercent(a: number, b: number): number {
   return Number((((a - b) / b) * 100).toFixed(2));
 }
 
+const onUpdateDividend = async (stock: DicStock) => {
+  const rData = await updateDividend(stock);
+  const instance = modal.create({
+    title: "派息历史",
+    width: "90%",
+    style: { minWidth: "800px" },
+    onCancel: () => {},
+    onOk: () => {},
+    slots: {
+      default: () =>
+        createVNode(
+          defineAsyncComponent(() => import("./components/DividendList.vue")),
+          {
+            stock,
+            rData,
+            onSubmit: async () => {
+              instance.close();
+              await list.onLoad();
+            },
+          }
+        ),
+    },
+  });
+};
+
 const dividendRefershedCount = ref(0);
 const dividendState = useAsyncState(
   async () => {
@@ -308,26 +331,7 @@ const dividendState = useAsyncState(
       // if (stock.market !== "A") continue;
       dividendRefershedCount.value += 1;
       try {
-        const rData: any = await fetch(
-          `http://akshare.frp.zezeping.com/api/public/stock_fhps_detail_em?symbol=${stock.code}`,
-          { method: "GET" }
-        ).then((response) => response.json());
-        // 查找最近日期
-        const closestRecord = rData
-          .filter((i: any) => i["股权登记日"] && i["现金分红-股息率"])
-          .reduce((closest: any, current: any) => {
-            if (!closest) return current;
-            const closestDate = dayjs(closest["股权登记日"]);
-            const currentDate = dayjs(current["股权登记日"]);
-            return closestDate.isAfter(currentDate) ? closest : current;
-          }, null);
-        merge(stock, {
-          extra: {
-            dividend: closestRecord["现金分红-股息率"],
-            dividend_record_at: dayjs(closestRecord["股权登记日"]).toDate().getTime(),
-          },
-        });
-        await stock.save();
+        await updateDividend(stock);
       } catch (e) {
         console.log(e);
       }
@@ -337,6 +341,29 @@ const dividendState = useAsyncState(
   null,
   { immediate: false }
 );
+async function updateDividend(stock: DicStock) {
+  const rData: any = await fetch(
+    `http://akshare.frp.zezeping.com/api/public/stock_fhps_detail_em?symbol=${stock.code}`,
+    { method: "GET" }
+  ).then((response) => response.json());
+  // 查找最近日期
+  const closestRecord = rData
+    .filter((i: any) => i["股权登记日"] && i["现金分红-股息率"])
+    .reduce((closest: any, current: any) => {
+      if (!closest) return current;
+      const closestDate = dayjs(closest["股权登记日"]);
+      const currentDate = dayjs(current["股权登记日"]);
+      return closestDate.isAfter(currentDate) ? closest : current;
+    }, null);
+  merge(stock, {
+    extra: {
+      dividend: closestRecord["现金分红-股息率"],
+      dividend_record_at: dayjs(closestRecord["股权登记日"]).toDate().getTime(),
+    },
+  });
+  await stock.save();
+  return rData;
+}
 </script>
 
 <template>
@@ -383,7 +410,9 @@ const dividendState = useAsyncState(
       :pagination="list.pagination"
       @change="onChange"
       :sticky="{ offsetHeader: 0 }"
+      :expand-column-width="30"
       bordered
+      rowKey="id"
     >
       <template #headerCell="{ column }">
         <template v-if="column.dataIndex === 'detail.市净率'">
@@ -424,7 +453,7 @@ const dividendState = useAsyncState(
                 </tbody>
               </table>
             </template>
-            市盈率(动)
+            市盈率|动
           </a-tooltip>
         </template>
         <template v-else-if="column.dataIndex === 'detail.量比'">
@@ -542,6 +571,12 @@ const dividendState = useAsyncState(
           {{ text ? dayjs(text).format("YYYY-MM-DD HH:mm:ss") : "" }}
         </template>
       </template>
+      <template #expandedRowRender="{ record }">
+        <a-button @click="onUpdateDividend(record)">刷新股息</a-button>
+      </template>
+      <!-- <template #expandColumnTitle>
+        <span style="color: red">More</span>
+      </template> -->
     </a-table>
   </main>
 </template>
