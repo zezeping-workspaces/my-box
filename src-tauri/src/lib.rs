@@ -55,8 +55,8 @@ pub fn run() {
             }
         })
         .setup(|app| {
-            // #[cfg(target_os = "macos")]
-            // app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
             // 获取 AppHandle 的 Arc<Mutex<>>
             let app_handle = Arc::new(Mutex::new(app.handle().clone()));
