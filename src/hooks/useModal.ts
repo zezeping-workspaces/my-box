@@ -48,6 +48,8 @@ const ModalComponent = defineComponent({
 
 interface ModalOptions {
 	title?: string,
+	width?: string,
+	style?: Record<string, any>,
 	onCancel?: () => any,
 	onOk?: () => any,
 	slots: Slot | Record<string, Slot | (() => VNode)>

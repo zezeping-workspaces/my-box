@@ -2,7 +2,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import sqlite from './sqlite'
 import notification from './notification';
 import snippet from './snippet';
-import dicStock from './dicStock';
 import stock from './stock';
 import { usePublicData, Options as PublciDataOptions } from "@/hooks/usePublicData";
 
@@ -17,7 +16,6 @@ async function init() {
 		await sqlite.init()
 		await notification.init()
 		await snippet.init()
-		await dicStock.init()
 		await stock.init()
 	}
 }
