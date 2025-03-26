@@ -9,6 +9,7 @@ import { useStorage } from '@vueuse/core'
 import dayjs from "dayjs";
 import axios from "axios";
 import { message } from '@tauri-apps/plugin-dialog';
+import { emitter } from '@/utils/emitter'
 
 async function init() {
 	const market = usePublicData("/data/markets.json");
@@ -114,6 +115,7 @@ async function updateSqliteStocks(market: PublciDataOptions) {
 				}
 			}
 		}
+		emitter.emit("updateStockPrices");
 	} catch (error) {
 		console.error(error)
 	}
