@@ -268,28 +268,22 @@ function getPercent(a: number, b: number) {
         </template>
         <template v-if="column.dataIndex === 'notice_lower_price'">
           <div v-if="text" class="min-w-[100px]">
-            <template v-if="record.price > text">
-              <a-tag color="red">{{ text }}</a-tag>
-            </template>
-            <template v-else-if="record.price < text">
-              <a-tag color="green">{{ text }}</a-tag>
+            <template v-if="record.price >= text">
+              <a-tag>{{ text }}</a-tag>
             </template>
             <template v-else>
-              <a-tag>{{ text }}</a-tag>
+              <a-tag color="green">{{ text }}</a-tag>
             </template>
             <span>{{ getPercent(record.price, text) }}%</span>
           </div>
         </template>
         <template v-if="column.dataIndex === 'notice_higher_price'">
           <div v-if="text" class="min-w-[100px]">
-            <template v-if="record.price > text">
-              <a-tag color="red">{{ text }}</a-tag>
-            </template>
-            <template v-else-if="record.price < text">
-              <a-tag color="green">{{ text }}</a-tag>
+            <template v-if="record.price <= text">
+              <a-tag>{{ text }}</a-tag>
             </template>
             <template v-else>
-              <a-tag>{{ text }}</a-tag>
+              <a-tag color="red">{{ text }}</a-tag>
             </template>
             <span>{{ getPercent(record.price, text) }}%</span>
           </div>
