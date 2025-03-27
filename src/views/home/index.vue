@@ -2,6 +2,6 @@
 
 <template>
   <main class="grid">
-    <router-link to="/preferences">preferences</router-link>
+    <!-- <router-link to="/preferences">preferences</router-link> -->
   </main>
 </template>

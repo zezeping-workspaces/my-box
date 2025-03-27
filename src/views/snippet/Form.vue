@@ -35,6 +35,7 @@ const form = useForm({
 
 <template>
   <main>
+    <a-tag>{{ `@${ form.model.tag }:${ form.model.code }$` }}</a-tag>
     <a-form :model="form.model" v-bind="{ ...form.layout }" @finish="form.onSubmit">
       <a-form-item
         label="tag"
