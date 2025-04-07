@@ -69,8 +69,8 @@ const onQueryCode = async (marketValue: string, code: string) => {
     name: stock?.name,
     price: stock?.price,
     price_at: stock?.updateTime,
-    today_begin_price: stock?.detail?.["今开"] || stock?.detail?.["开盘价"],
-    yestoday_end_price: stock?.detail?.["昨收"],
+    today_begin_price: stock?.detail?.["open_price"],
+    yestoday_end_price: stock?.detail?.["close_price"],
   });
 };
 

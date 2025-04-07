@@ -1,10 +1,9 @@
 <script lang="tsx" setup>
-import { createVNode, defineAsyncComponent, onUnmounted, ref } from "vue";
+import { createVNode, defineAsyncComponent, ref } from "vue";
 import { useSqliteList } from "@/hooks/useSqliteList";
 import { getSqliteInstance } from "@/services/sqlite";
 import { useModal } from "@/hooks/useModal";
 import { notification } from "ant-design-vue";
-import { emitter } from "@/utils/emitter";
 
 const sqliteInstance = getSqliteInstance();
 const modal = useModal();
@@ -52,10 +51,6 @@ const list = useSqliteList({
   ],
 });
 list.onLoad();
-emitter.on("updateStockPrices", list.onLoad);
-onUnmounted(() => {
-  emitter.off("updateStockPrices", list.onLoad);
-})
 
 const onChange = (pagination: any) => {
   list.pagination = pagination;

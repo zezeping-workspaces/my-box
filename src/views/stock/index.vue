@@ -1,11 +1,12 @@
 <script lang="tsx" setup>
-import { createVNode, defineAsyncComponent } from "vue";
+import { createVNode, defineAsyncComponent, onUnmounted } from "vue";
 import { useSqliteList } from "@/hooks/useSqliteList";
 import { getSqliteInstance } from "@/services/sqlite";
 import { useModal } from "@/hooks/useModal";
 import { notification } from "ant-design-vue";
 import { usePublicData } from "@/hooks/usePublicData";
 import dayjs from "dayjs";
+import { emitter } from "@/utils/emitter";
 
 const sqliteInstance = getSqliteInstance();
 const modal = useModal();
@@ -189,6 +190,11 @@ const onNoticeEnabled = async (checked: boolean, record: Record<string, any>) =>
 function getPercent(a: number, b: number) {
   return (((a - b) / b) * 100).toFixed(2);
 }
+
+emitter.on("updateStockPrices", list.onLoad);
+onUnmounted(() => {
+  emitter.off("updateStockPrices", list.onLoad);
+});
 </script>
 
 <template>

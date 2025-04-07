@@ -88,6 +88,7 @@ async function updateSqliteStocks(market: PublciDataOptions) {
 		for (const stock of stocks) {
 			const { data: rData } = await fetchStocksApi(market.getLabelFromValue(stock.market), [stock.code]);
 			const newStock = rData?.data?.stocks?.[0];
+			console.log(1243, newStock)
 			if (newStock) {
 				await sqliteInstance.execute(
 					`UPDATE stocks set name = $1, price = $2, price_at = $3, today_begin_price = $4, yestoday_end_price = $5 where id = $6;`,
@@ -95,8 +96,8 @@ async function updateSqliteStocks(market: PublciDataOptions) {
 						newStock.name,
 						newStock.price,
 						newStock.updateTime,
-						newStock.detail?.["今开"] || newStock.detail?.["开盘价"],
-						newStock.detail?.["昨收"],
+						newStock.detail?.["open_price"],
+						newStock.detail?.["close_price"],
 						stock.id
 					])
 			}
