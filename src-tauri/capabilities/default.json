@@ -23,7 +23,7 @@
       "identifier": "http:default",
       "allow": [
         { "url": "https://zezeping.com" },
-        { "url": "http://akshare.frp.zezeping.com" }
+        { "url": "http://qt.gtimg.cn" }
       ],
       "deny": []
     }

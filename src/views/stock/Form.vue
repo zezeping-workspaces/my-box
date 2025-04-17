@@ -4,7 +4,12 @@ import { getSqliteInstance } from "@/services/sqlite";
 import { notification } from "ant-design-vue";
 import { usePublicData } from "@/hooks/usePublicData";
 import { fetchStocksApi } from "@/api";
+import { AStockApi } from "@/api/StockApi";
 import { watch } from "vue";
+
+AStockApi.fetchStocksApi(["000625", "600519"]).then((list) => {
+  console.log(list);
+});
 
 const props = defineProps({
   record: Object,
@@ -63,8 +68,16 @@ const form = useForm({
 const onQueryCode = async (marketValue: string, code: string) => {
   const marketLabel = market.getLabelFromValue(marketValue);
   if (!marketLabel || !code) return;
-  const { data: rData } = await fetchStocksApi(marketLabel, [code]);
-  const stock = rData?.data?.stocks?.[0];
+
+  let stock = null;
+  if (marketLabel === "A股") {
+    const stocks = await AStockApi.fetchStocksApi([code]);
+    stock = stocks?.[0];
+  }
+  if (!stock) {
+    const { data: rData } = await fetchStocksApi(marketLabel, [code]);
+    stock = rData?.data?.stocks?.[0];
+  }
   Object.assign(form.model, {
     name: stock?.name,
     price: stock?.price,
