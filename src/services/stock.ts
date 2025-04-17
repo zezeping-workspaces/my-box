@@ -5,6 +5,7 @@ import { getSqliteInstance } from "./sqlite";
 import { sendNotification } from './notification';
 import { usePublicData, Options as PublciDataOptions } from "@/hooks/usePublicData";
 import { fetchStocksApi, } from "@/api";
+import { AStockApi } from "@/api/StockApi";
 import { useStorage } from '@vueuse/core'
 import dayjs from "dayjs";
 import axios from "axios";
@@ -86,9 +87,17 @@ async function updateSqliteStocks(market: PublciDataOptions) {
 		const sqliteInstance = getSqliteInstance();
 		const stocks: any = await sqliteInstance.select(`select * from stocks;`)
 		for (const stock of stocks) {
-			const { data: rData } = await fetchStocksApi(market.getLabelFromValue(stock.market), [stock.code]);
-			const newStock = rData?.data?.stocks?.[0];
-			console.log(1243, newStock)
+			const marketLabel = market.getLabelFromValue(stock.market)
+			let newStock = null;
+			if (marketLabel === "A股") {
+				const stocks = await AStockApi.fetchStocksApi([stock.code]);
+				newStock = stocks?.[0];
+			}
+			if (!newStock) {
+				const { data: rData } = await fetchStocksApi(marketLabel, [stock.code]);
+				newStock = rData?.data?.stocks?.[0];
+			}
+			// console.log(1243, newStock)
 			if (newStock) {
 				await sqliteInstance.execute(
 					`UPDATE stocks set name = $1, price = $2, price_at = $3, today_begin_price = $4, yestoday_end_price = $5 where id = $6;`,
