@@ -43,7 +43,10 @@ export class AStockApi {
 				}
 			})
 			const list = rData?.data?.stocks || []
-			return list
+			if (list.find((item: any) => dayjs(item.updateTime).isSame(dayjs(), 'day'))) {
+				return list	
+			}
+			throw new Error('zzp数据未更新')
 		} catch (error) {
 			console.error(error)
 			await new Promise((resolve) => setTimeout(resolve, 3000))
